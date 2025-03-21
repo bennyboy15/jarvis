@@ -1,0 +1,13 @@
+config.py
+
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# Other common files to ignore
+*.env
+*.log
+
