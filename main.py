@@ -10,6 +10,10 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 def speak(text):
     engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('rate', 170)  # Speed of speech (default is 200)
+    engine.setProperty('volume', 1)  # Volume level (0.0 to 1.0)
+    engine.setProperty('voice', voices[0].id)  # Set voice (only 2 at the moment)
     engine.say(text)
     engine.runAndWait()
 
@@ -23,7 +27,7 @@ def listen():
             print(f"You said: {command}")
             return command.lower()
         except sr.UnknownValueError:
-            speak("Sorry sir, you are going to have to repeat that.")
+            speak("Sorry sir, I didn't catch what you said.")
             return ""
         except sr.RequestError:
             speak("Sorry sir, it appears my speech service is down at the moment.")
@@ -61,20 +65,22 @@ def execute_command(command):
         speak("I'm not sure how to help with that.")
 
 def execute_convo(voice_txt):
+
     completion = client.chat.completions.create(
         model= "gpt-4o",
-        messages=[{
-            "role": "user",
-            "content": voice_txt
-        }]
+        messages=[
+            {"role": "system", "content": "You are JARVIS from Iron Man and your purpose is to assist me in any task I request of you by having personable conversations. You should keep your responses to a few sentences. Reply as if you are JARVIS from Iron Man"}, # Context
+            {"role": "user", "content": voice_txt} # User speech
+        ]
     )
+    conversation_history.append({"role":"user", "content":voice_txt})
     speak(completion.choices[0].message.content)
 
 if __name__ == "__main__":
+    conversation_history = []
     greet()
     while True:
         user_command = listen()
         if user_command:
-            print("COMMAND: ", user_command)
             #execute_command(user_command)
             execute_convo(user_command)
