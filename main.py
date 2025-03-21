@@ -2,6 +2,7 @@ import speech_recognition as sr
 import pyttsx3
 import datetime
 import webbrowser
+import subprocess
 import os
 from openai import OpenAI
 from config import OPENAI_API_KEY
@@ -27,7 +28,7 @@ def listen():
             print(f"You said: {command}")
             return command.lower()
         except sr.UnknownValueError:
-            speak("Sorry sir, I didn't catch what you said.")
+            #speak("Sorry sir, I didn't catch what you said.")
             return ""
         except sr.RequestError:
             speak("Sorry sir, it appears my speech service is down at the moment.")
@@ -53,6 +54,9 @@ def execute_command(command):
     elif 'open google' in command:
         webbrowser.open("https://www.google.com")
         speak("Opening Google")
+    elif 'vs code' in command:
+        path_to_open = "C:\\Users\\benny\\OneDrive\\Desktop\\WORKSPACE"
+        subprocess.run(["code", path_to_open], shell=True)
     elif 'play music' in command:
         music_dir = "C:\\Your\\Music\\Directory"  # Change this to your music folder
         songs = os.listdir(music_dir)
@@ -65,11 +69,10 @@ def execute_command(command):
         speak("I'm not sure how to help with that.")
 
 def execute_convo(voice_txt):
-
     completion = client.chat.completions.create(
         model= "gpt-4o",
         messages=[
-            {"role": "system", "content": "You are JARVIS from Iron Man and your purpose is to assist me in any task I request of you by having personable conversations. You should keep your responses to a few sentences. Reply as if you are JARVIS from Iron Man"}, # Context
+            {"role": "system", "content": "You are JARVIS from Iron Man and your purpose is to assist me in any task I request of you by having personable conversations. You should keep your responses short, one sentence. Reply as if you are JARVIS from Iron Man"}, # Context
             {"role": "user", "content": voice_txt} # User speech
         ]
     )
